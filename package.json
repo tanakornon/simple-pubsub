@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "start": "ts-node src/app.ts",
-        "test": "jest --verbose ./tests"
+        "test": "jest --verbose ./tests",
+        "test:coverage": "jest --verbose ./tests --coverage"
     },
     "author": "",
     "license": "ISC",
