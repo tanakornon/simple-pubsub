@@ -33,6 +33,3 @@ export class PublishSubscribeService implements IPublishSubscribeService {
         }
     }
 }
-
-const eventBus = new PublishSubscribeService();
-export default eventBus;

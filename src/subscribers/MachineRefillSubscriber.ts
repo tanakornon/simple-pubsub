@@ -1,11 +1,13 @@
 import { MachineRefillEvent } from "../events/MachineRefillEvent";
 import { StockLevelOkEvent } from "../events/StockLevelOkEvent";
+import { INotifier } from "../interfaces/INotifier";
+import { IPublishSubscribeService } from "../interfaces/IPublishSubscribeService";
 import { ISubscriber } from "../interfaces/ISubscriber";
 import { Machine } from "../models/Machine";
-import eventBus from "../services/PublishSubscribeService";
 
-export class MachineRefillSubscriber implements ISubscriber {
+export class MachineRefillSubscriber implements ISubscriber, INotifier {
     public machines: Record<string, Machine>;
+    public service: IPublishSubscribeService | undefined;
 
     constructor(machines: Record<string, Machine>) {
         this.machines = machines;
@@ -29,8 +31,18 @@ export class MachineRefillSubscriber implements ISubscriber {
             if (!machine.stockLevelOkFired) {
                 machine.stockLevelOkFired = true;
                 machine.stockWarningFired = false;
-                eventBus.publish(stockLevelOkEvent);
+                this.notify(stockLevelOkEvent);
             }
+        }
+    }
+
+    register(service: IPublishSubscribeService): void {
+        this.service = service;
+    }
+
+    notify(event: StockLevelOkEvent): void {
+        if (this.service) {
+            this.service.publish(event);
         }
     }
 }

@@ -1,11 +1,13 @@
 import { LowStockWarningEvent } from "../events/LowStockWarningEvent";
 import { MachineSaleEvent } from "../events/MachineSaleEvent";
+import { INotifier } from "../interfaces/INotifier";
+import { IPublishSubscribeService } from "../interfaces/IPublishSubscribeService";
 import { ISubscriber } from "../interfaces/ISubscriber";
 import { Machine } from "../models/Machine";
-import eventBus from "../services/PublishSubscribeService";
 
-export class MachineSaleSubscriber implements ISubscriber {
+export class MachineSaleSubscriber implements ISubscriber, INotifier {
     public machines: Record<string, Machine>;
+    public service: IPublishSubscribeService | undefined;
 
     constructor(machines: Record<string, Machine>) {
         this.machines = machines;
@@ -26,6 +28,7 @@ export class MachineSaleSubscriber implements ISubscriber {
             console.warn(
                 `WARN: Machine: ${machine.id} not enough item to sold.`
             );
+            return;
         }
 
         machine.stockLevel -= soldQuantity;
@@ -36,8 +39,18 @@ export class MachineSaleSubscriber implements ISubscriber {
             if (!machine.stockWarningFired) {
                 machine.stockWarningFired = true;
                 machine.stockLevelOkFired = false;
-                eventBus.publish(lowStockWarningEvent);
+                this.notify(lowStockWarningEvent);
             }
+        }
+    }
+
+    register(service: IPublishSubscribeService): void {
+        this.service = service;
+    }
+
+    notify(event: LowStockWarningEvent): void {
+        if (this.service) {
+            this.service.publish(event);
         }
     }
 }

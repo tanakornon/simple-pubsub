@@ -1,5 +1,6 @@
+import { IPublishSubscribeService } from "./interfaces/IPublishSubscribeService";
 import { Machine } from "./models/Machine";
-import eventBus from "./services/PublishSubscribeService";
+import { PublishSubscribeService } from "./services/PublishSubscribeService";
 import { MachineRefillSubscriber } from "./subscribers/MachineRefillSubscriber";
 import { MachineSaleSubscriber } from "./subscribers/MachineSaleSubscriber";
 import { StockLevelOkSubscriber } from "./subscribers/StockLevelOkSubscriber";
@@ -15,27 +16,30 @@ async function main() {
     };
 
     // create the PubSub service
-    // const pubSubService: IPublishSubscribeService =
-    //     new PublishSubscribeService();
+    const pubSubService: IPublishSubscribeService =
+        new PublishSubscribeService();
 
     // create a machine sale event subscriber. inject the machines (all subscribers should do this)
     const saleSubscriber = new MachineSaleSubscriber(machines);
     const refillSubscriber = new MachineRefillSubscriber(machines);
-    const stockLevelOkSubscriber = new StockLevelOkSubscriber(machines);
     const stockWarningSubscriber = new StockWarningSubscriber(machines);
+    const stockLevelOkSubscriber = new StockLevelOkSubscriber(machines);
 
-    eventBus.subscribe("sale", saleSubscriber);
-    eventBus.subscribe("refill", refillSubscriber);
-    eventBus.subscribe("stockLevelOk", stockLevelOkSubscriber);
-    eventBus.subscribe("lowStockWarning", stockWarningSubscriber);
+    saleSubscriber.register(pubSubService);
+    refillSubscriber.register(pubSubService);
+
+    pubSubService.subscribe("sale", saleSubscriber);
+    pubSubService.subscribe("refill", refillSubscriber);
+    pubSubService.subscribe("lowStockWarning", stockWarningSubscriber);
+    pubSubService.subscribe("stockLevelOk", stockLevelOkSubscriber);
 
     // create 5 random events
-    const events = Array.from({ length: 100 }, () => eventGenerator());
+    const events = Array.from({ length: 5 }, () => eventGenerator());
 
     // publish the events
     // events.map(pubSubService.publish.bind(pubSubService));
     for (const event of events) {
-        eventBus.publish(event);
+        pubSubService.publish(event);
         // console.log(event, machines);
     }
 
