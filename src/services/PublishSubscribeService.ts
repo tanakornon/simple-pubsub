@@ -20,7 +20,6 @@ export class PublishSubscribeService implements IPublishSubscribeService {
             this.subscribers[eventType] = [];
         }
         this.subscribers[eventType].push(subscriber);
-        console.log(this.subscribers);
     }
 
     unsubscribe(eventType: string, subscriber: ISubscriber): void {
