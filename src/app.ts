@@ -8,11 +8,11 @@ import { eventGenerator } from "./utils";
 
 async function main() {
     // create 3 machines with a quantity of 10 stock
-    const machines: Machine[] = [
-        new Machine("001"),
-        new Machine("002"),
-        new Machine("003"),
-    ];
+    const machines: Record<string, Machine> = {
+        "001": new Machine("001"),
+        "002": new Machine("002"),
+        "003": new Machine("003"),
+    };
 
     // create the PubSub service
     // const pubSubService: IPublishSubscribeService =
@@ -39,7 +39,7 @@ async function main() {
         // console.log(event, machines);
     }
 
-    return 0
+    return 0;
 }
 
 main().then(console.log).catch(console.error);

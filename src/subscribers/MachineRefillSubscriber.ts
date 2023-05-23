@@ -5,9 +5,9 @@ import { Machine } from "../models/Machine";
 import eventBus from "../services/PublishSubscribeService";
 
 export class MachineRefillSubscriber implements ISubscriber {
-    public machines: Machine[];
+    public machines: Record<string, Machine>;
 
-    constructor(machines: Machine[]) {
+    constructor(machines: Record<string, Machine>) {
         this.machines = machines;
     }
 
@@ -15,9 +15,7 @@ export class MachineRefillSubscriber implements ISubscriber {
         const machineId = event.machineId();
         const refillQuantity = event.getRefillQuantity();
 
-        const machine = this.machines.find(
-            (machine) => machine.id == machineId
-        );
+        const machine = this.machines[machineId];
 
         if (!machine) {
             return;

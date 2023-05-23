@@ -3,18 +3,16 @@ import { ISubscriber } from "../interfaces/ISubscriber";
 import { Machine } from "../models/Machine";
 
 export class StockLevelOkSubscriber implements ISubscriber {
-    public machines: Machine[];
+    public machines: Record<string, Machine>;
 
-    constructor(machines: Machine[]) {
+    constructor(machines: Record<string, Machine>) {
         this.machines = machines;
     }
 
     handle(event: StockLevelOkEvent): void {
         const machineId = event.machineId();
 
-        const machine = this.machines.find(
-            (machine) => machine.id == machineId
-        );
+        const machine = this.machines[machineId];
 
         if (!machine) {
             return;
