@@ -1,4 +1,5 @@
 import { IPublishSubscribeService } from "./interfaces/IPublishSubscribeService";
+import { DependencyContainer } from "./models/DependencyContainer";
 import { Machine } from "./models/Machine";
 import { PublishSubscribeService } from "./services/PublishSubscribeService";
 import { MachineRefillSubscriber } from "./subscribers/MachineRefillSubscriber";
@@ -19,14 +20,13 @@ async function main() {
     const pubSubService: IPublishSubscribeService =
         new PublishSubscribeService();
 
+    DependencyContainer.registerService("pubSubService", pubSubService);
+
     // create a machine sale event subscriber. inject the machines (all subscribers should do this)
     const saleSubscriber = new MachineSaleSubscriber(machines);
     const refillSubscriber = new MachineRefillSubscriber(machines);
     const stockWarningSubscriber = new StockWarningSubscriber(machines);
     const stockLevelOkSubscriber = new StockLevelOkSubscriber(machines);
-
-    saleSubscriber.register(pubSubService);
-    refillSubscriber.register(pubSubService);
 
     pubSubService.subscribe("sale", saleSubscriber);
     pubSubService.subscribe("refill", refillSubscriber);

@@ -5,24 +5,24 @@ import { PublishSubscribeService } from "../src/services/PublishSubscribeService
 import { MachineSaleSubscriber } from "../src/subscribers/MachineSaleSubscriber";
 
 describe("PublishSubscribeService", () => {
-    let publishSubscribeService: IPublishSubscribeService;
+    let pubSubService: IPublishSubscribeService;
     let machine: Machine;
     let saleSubscriber: MachineSaleSubscriber;
 
     beforeEach(() => {
-        publishSubscribeService = new PublishSubscribeService();
+        pubSubService = new PublishSubscribeService();
 
         machine = new Machine("001");
 
         saleSubscriber = new MachineSaleSubscriber({ "001": machine });
 
-        publishSubscribeService.subscribe("sale", saleSubscriber);
+        pubSubService.subscribe("sale", saleSubscriber);
     });
 
     it("should notify subscribers when publishing an event", () => {
         const saleEvent = new MachineSaleEvent(1, "001");
 
-        publishSubscribeService.publish(saleEvent);
+        pubSubService.publish(saleEvent);
 
         expect(machine.stockLevel).toBe(9);
     });
@@ -33,22 +33,22 @@ describe("PublishSubscribeService", () => {
             "002": anotherMachine,
         });
 
-        publishSubscribeService.subscribe("sale", anotherSaleSubscriber);
+        pubSubService.subscribe("sale", anotherSaleSubscriber);
 
         const saleEvent = new MachineSaleEvent(1, "001");
 
-        publishSubscribeService.publish(saleEvent);
+        pubSubService.publish(saleEvent);
 
         expect(machine.stockLevel).toBe(9);
         expect(anotherMachine.stockLevel).toBe(10);
     });
 
     it("should unsubscribe subscribers from receiving events", () => {
-        publishSubscribeService.unsubscribe("sale", saleSubscriber);
+        pubSubService.unsubscribe("sale", saleSubscriber);
 
         const saleEvent = new MachineSaleEvent(1, "001");
 
-        publishSubscribeService.publish(saleEvent);
+        pubSubService.publish(saleEvent);
 
         expect(machine.stockLevel).toBe(10);
     });
